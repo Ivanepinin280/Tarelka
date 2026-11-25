@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Калории и БЖУ по фото блюда, простые ПП-рецепты, меню на день и дневник питания.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Тарелка">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px)}
+html{-webkit-text-size-adjust:100%}
+img{max-width:100%}
+@media (display-mode: standalone){#a2hs{display:none!important}}
+</style>
+<title>Тарелка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Раскладка: одна колонка в духе iOS. Крупный заголовок, сгруппированные списки, матовая нижняя панель, рецепт открывается снизу листом. */
+:root{
+  --bg:#F2F2F7; --surface:#FFFFFF; --label:#1C1C1E; --label2:#6C6C70;
+  --sep:rgba(60,60,67,.16); --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.2); --seg-on:#FFFFFF;
+  --tint:#0071E3; --tint-soft:rgba(0,113,227,.1); --btn:#0071E3; --btn-ink:#FFFFFF;
+  --green:#34C759; --red:#FF3B30; --red-ink:#D70015;
+  --cp:#FF2D55; --cf:#FF9500; --cc:#32ADE6;
+  --bar:rgba(249,249,249,.8); --scrim:rgba(0,0,0,.35);
+  --g-b1:#FFD60A; --g-b2:#FF9F0A; --g-l1:#6BDB84; --g-l2:#30B455; --g-d1:#7D7AFF; --g-d2:#5E5CE6; --g-s1:#FF7A93; --g-s2:#FF375F;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --surface:#1C1C1E; --label:#F5F5F7; --label2:#98989F;
+    --sep:rgba(84,84,88,.55); --fill:rgba(120,120,128,.24); --fill2:rgba(120,120,128,.34); --seg-on:#636366;
+    --tint:#4DA3FF; --tint-soft:rgba(77,163,255,.16);
+    --green:#30D158; --red:#FF453A; --red-ink:#FF6961;
+    --cp:#FF375F; --cf:#FF9F0A; --cc:#64D2FF;
+    --bar:rgba(28,28,30,.8); --scrim:rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1C1C1E; --label:#F5F5F7; --label2:#98989F;
+  --sep:rgba(84,84,88,.55); --fill:rgba(120,120,128,.24); --fill2:rgba(120,120,128,.34); --seg-on:#636366;
+  --tint:#4DA3FF; --tint-soft:rgba(77,163,255,.16);
+  --green:#30D158; --red:#FF453A; --red-ink:#FF6961;
+  --cp:#FF375F; --cf:#FF9F0A; --cc:#64D2FF;
+  --bar:rgba(28,28,30,.8); --scrim:rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{
+  margin:0; background:var(--bg); color:var(--label);
+  font:400 16px/1.4 var(--font); -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums;
+  padding-block:8px 104px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3,h4,p,ul,ol{margin:0}
+button,input,select{font:inherit;color:inherit}
+.stack{display:flex;flex-direction:column;gap:16px}
+.view{animation:rise .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* заголовок */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:8px}
+.top-t{min-width:0}
+.eyebrow{font:600 13px/1.2 var(--font);color:var(--label2);text-transform:uppercase;letter-spacing:.04em}
+h1{font:700 34px/1.1 var(--font);letter-spacing:-.022em;margin-top:4px}
+h2{font:700 24px/1.2 var(--font);letter-spacing:-.015em;text-wrap:balance}
+h3{font:600 17px/1.3 var(--font);letter-spacing:-.01em}
+.lead{color:var(--label2);font-size:16px;max-width:52ch}
+.small{font-size:13px;color:var(--label2);line-height:1.4}
+.sec-h{font:600 13px/1.2 var(--font);color:var(--label2);text-transform:uppercase;letter-spacing:.04em;padding:0 16px 8px}
+.mini{position:relative;flex:none;width:44px;height:44px;display:grid;place-items:center;text-decoration:none;color:var(--label);border-radius:50%}
+.mini svg{position:absolute;inset:0}
+.m-bg,.m-fg{fill:none;stroke-width:4}
+.m-bg{stroke:var(--fill2)}
+.m-fg{stroke:var(--green);stroke-linecap:round;stroke-dasharray:113.1;stroke-dashoffset:113.1;transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
+.m-fg.over{stroke:var(--red)}
+.mini span{position:relative;font:700 11px/1 var(--font);letter-spacing:-.02em}
+
+/* карточки и группы */
+.card{background:var(--surface);border-radius:20px;padding:16px}
+.group{background:var(--surface);border-radius:18px;overflow:hidden}
+.cell{position:relative;display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:48px}
+.cell+.cell::before{content:"";position:absolute;top:0;left:16px;right:0;height:1px;background:var(--sep)}
+.cell label{flex:none;font-weight:500}
+.cell input[type=text],.cell input[type=number],.cell select{flex:1;min-width:0;border:0;background:transparent;font-size:16px;text-align:right;padding:8px 0;min-height:44px;outline:0;color:var(--label)}
+.cell select{appearance:none;-webkit-appearance:none;cursor:pointer}
+.cell:focus-within{background:var(--fill)}
+input::placeholder{color:var(--label2);opacity:.8}
+.cell.col{flex-direction:column;align-items:stretch;gap:8px}
+
+/* кнопки */
+.btn{
+  min-height:50px;padding:0 20px;border-radius:14px;border:0;background:var(--tint-soft);color:var(--tint);
+  font:600 17px/1 var(--font);letter-spacing:-.01em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .15s,opacity .15s;
+}
+.btn:active{transform:scale(.97);opacity:.85}
+.btn.primary{background:var(--btn);color:var(--btn-ink)}
+.btn.wide{width:100%}
+.btn.sm{min-height:36px;padding:0 14px;font-size:15px;border-radius:10px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.row{display:flex;gap:12px}
+.row>*{flex:1 1 0}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+
+/* сегменты */
+.seg{display:flex;gap:2px;padding:2px;background:var(--fill);border-radius:10px;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;min-height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;font:500 13px/1 var(--font);cursor:pointer;white-space:nowrap;transition:background .2s,box-shadow .2s}
+.seg button[aria-pressed="true"]{background:var(--seg-on);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
+
+/* видоискатель */
+.finder{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:24px;overflow:hidden;background:var(--fill)}
+.finder img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.finder-btn{position:absolute;inset:0;width:100%;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:24px}
+.finder-btn svg{color:var(--tint)}
+.finder-btn .ft{font:600 17px/1.2 var(--font)}
+.finder-btn .fs{font-size:14px;color:var(--label2)}
+.cr{position:absolute;width:28px;height:28px;border:3px solid var(--label2);opacity:.5;pointer-events:none}
+.cr.tl{top:16px;left:16px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.cr.tr{top:16px;right:16px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.cr.bl{bottom:16px;left:16px;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.cr.br{bottom:16px;right:16px;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.finder.has .cr{border-color:#fff;opacity:.8}
+.status{min-height:20px;font-size:15px;color:var(--label2);text-align:center}
+.status.err{color:var(--red-ink)}
+.spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--fill2);border-top-color:var(--tint);vertical-align:-2px;margin-right:8px;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* результат */
+.big{font:700 56px/1 var(--font);letter-spacing:-.04em}
+.big small{font:500 17px var(--font);letter-spacing:0;color:var(--label2);margin-left:6px}
+.kc-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mt{background:var(--fill);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.mt .ml{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--label2);font-weight:500}
+.mt b{font:700 20px/1.1 var(--font);letter-spacing:-.02em}
+.mt .mp{font-size:12px;color:var(--label2)}
+.track{display:block;height:5px;border-radius:99px;background:var(--fill2);overflow:hidden;margin-top:2px}
+.track i{display:block;height:100%;border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.track i.p{background:var(--cp)}.track i.f{background:var(--cf)}.track i.c{background:var(--cc)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.dot.p{background:var(--cp)}.dot.f{background:var(--cf)}.dot.c{background:var(--cc)}
+.item-n{margin-left:auto;display:flex;gap:16px;font-variant-numeric:tabular-nums;color:var(--label2)}
+.item-n b{color:var(--label);font-weight:600;min-width:42px;text-align:right}
+.callout{padding:12px 14px;border-radius:14px;background:var(--tint-soft);font-size:15px}
+
+/* рецепты */
+.search{position:relative}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--label2);pointer-events:none}
+.search input{width:100%;min-height:40px;border:0;border-radius:12px;background:var(--fill);padding:0 12px 0 38px;font-size:17px;outline:0;-webkit-appearance:none;appearance:none}
+.search input:focus-visible{outline:2px solid var(--tint)}
+.rrow{
+  width:100%;border:0;background:transparent;text-align:left;cursor:pointer;display:flex;align-items:center;gap:14px;
+  padding:12px 16px;position:relative;transition:background .15s;
+}
+.rrow:active{background:var(--fill)}
+.rrow+.rrow::before{content:"";position:absolute;top:0;left:86px;right:0;height:1px;background:var(--sep)}
+.tile{flex:none;width:56px;height:56px;border-radius:14px;display:grid;place-items:center;color:#fff}
+.tile.t-b{background:linear-gradient(145deg,var(--g-b1),var(--g-b2))}
+.tile.t-l{background:linear-gradient(145deg,var(--g-l1),var(--g-l2))}
+.tile.t-d{background:linear-gradient(145deg,var(--g-d1),var(--g-d2))}
+.tile.t-s{background:linear-gradient(145deg,var(--g-s1),var(--g-s2))}
+.tile.sm{width:36px;height:36px;border-radius:10px}
+.tile.sm svg{width:20px;height:20px}
+.r-mid{flex:1;min-width:0;display:block}
+.r-mid .rn{display:block;font:600 16px/1.25 var(--font);letter-spacing:-.01em}
+.r-mid .rm{display:block;font-size:13px;color:var(--label2);margin-top:2px}
+.r-mid .rb{display:flex;flex-wrap:wrap;gap:2px 10px;font-size:12px;color:var(--label2);margin-top:4px}
+.r-mid .rb span{display:inline-flex;align-items:center;gap:4px}
+.r-k{flex:none;text-align:right;display:block}
+.r-k b{display:block;font:700 20px/1 var(--font);letter-spacing:-.02em}
+.r-k span{font-size:12px;color:var(--label2)}
+.chev{flex:none;color:var(--label2);opacity:.6}
+.empty{text-align:center;color:var(--label2);padding:32px 16px}
+.menu-total{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.menu-total .big{font-size:40px}
+
+/* дневник */
+.hero{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.ring{position:relative;width:148px;height:148px;flex:none}
+.ring svg{display:block}
+.ring-bg,.ring-fg{fill:none;stroke-width:14}
+.ring-bg{stroke:var(--fill2)}
+.ring-fg{stroke:var(--green);stroke-linecap:round;transition:stroke-dashoffset .7s cubic-bezier(.2,.8,.2,1)}
+.ring-fg.over{stroke:var(--red)}
+.ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.ring-c b{font:700 32px/1 var(--font);letter-spacing:-.03em}
+.ring-c span{font-size:13px;color:var(--label2);margin-top:2px}
+.mprog{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.mp-row{display:flex;flex-direction:column;gap:4px}
+.mp-h{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.mp-h span:first-child{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.mp-h span:last-child{color:var(--label2)}
+.mp-h b{color:var(--label);font-weight:600}
+.meal-h{display:flex;justify-content:space-between;align-items:baseline;padding:0 16px 8px}
+.meal-h .sec-h{padding:0}
+.entry .nm{flex:1;min-width:0}
+.entry .nm b{display:block;font-weight:600;overflow-wrap:anywhere}
+.entry .kc{font:600 16px var(--font);white-space:nowrap}
+.x{flex:none;width:32px;height:32px;border:0;border-radius:50%;background:var(--fill);color:var(--label2);cursor:pointer;display:grid;place-items:center}
+.x:active{background:var(--fill2)}
+details.group>summary{list-style:none;cursor:pointer;padding:12px 16px;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:500}
+details.group>summary::-webkit-details-marker{display:none}
+details.group>summary .val{color:var(--label2)}
+details[open].group>summary .val{color:var(--tint)}
+.goal-body{padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.goal-body .group{background:var(--bg)}
+.goal-body .cell:focus-within{background:var(--fill)}
+
+/* нижняя панель */
+.nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bar);
+  -webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);
+  border-top:1px solid var(--sep);
+  padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+}
+.nav-in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:12px;color:var(--label2);text-decoration:none;font-size:11px;font-weight:600;transition:color .2s}
+.nav a[aria-current="page"]{color:var(--tint)}
+
+/* лист рецепта */
+.sheet{position:fixed;inset:0;z-index:50}
+.scrim{position:absolute;inset:0;background:var(--scrim);opacity:0;transition:opacity .3s}
+.panel{
+  position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:680px;max-height:92%;
+  background:var(--bg);border-radius:28px 28px 0 0;display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .45s cubic-bezier(.32,.72,0,1);outline:0;
+  box-shadow:0 -10px 40px rgba(0,0,0,.2);
+}
+.sheet.open .scrim{opacity:1}
+.sheet.open .panel{transform:none}
+.grab{width:40px;height:5px;border-radius:99px;background:var(--fill2);margin:8px auto 0;flex:none}
+.close{position:absolute;top:14px;right:14px;z-index:2;width:32px;height:32px;border:0;border-radius:50%;background:var(--fill);color:var(--label2);cursor:pointer;display:grid;place-items:center}
+.panel-body{overflow-y:auto;padding:20px max(16px,env(safe-area-inset-left,0px)) 16px;display:flex;flex-direction:column;gap:20px;overscroll-behavior:contain}
+.panel-bar{flex:none;padding:12px max(16px,env(safe-area-inset-left,0px)) calc(12px + env(safe-area-inset-bottom,0px));background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--sep)}
+.s-head{display:flex;gap:14px;align-items:center;padding-right:40px}
+.s-head .tile{width:64px;height:64px;border-radius:16px}
+.steps{list-style:none;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:12px 16px}
+.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--tint-soft);color:var(--tint);font:700 13px/24px var(--font);text-align:center}
+.steps li+li::after{content:"";position:absolute}
+.steps li{position:relative}
+.steps li+li{border-top:1px solid var(--sep);margin-left:16px;padding-left:0;padding-right:16px}
+
+#toast{
+  position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);
+  background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  color:var(--label);padding:12px 18px;border-radius:99px;font-size:15px;font-weight:600;border:1px solid var(--sep);
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:60;max-width:calc(100% - 32px);text-align:center;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){
+  .view{animation:none}
+  .spin{animation:none}
+  .ring-fg,.m-fg,.track i,.scrim,.panel,#toast,.btn,.seg button{transition:none}
+}
+@media (max-width:380px){
+  h1{font-size:30px}.big{font-size:48px}
+  .rrow+.rrow::before{left:16px}
+  .tile{width:48px;height:48px}
+  .mtiles{gap:6px}.mt{padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="top-t"><p class="eyebrow" id="dateLbl"></p><h1 id="title">Скан</h1></div>
+    <a class="mini" href="#diary" id="mini" aria-label="Калории за сегодня, открыть дневник">
+      <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true"><circle class="m-bg" cx="22" cy="22" r="18"/><circle class="m-fg" id="miniFg" cx="22" cy="22" r="18" transform="rotate(-90 22 22)"/></svg>
+      <span id="miniNum">0</span>
+    </a>
+  </header>
+
+  <!-- СКАН -->
+  <section id="view-scan" class="stack view" hidden>
+    <p class="lead">Сфотографируйте блюдо и получите калории, БЖУ и состав порции.</p>
+
+    <div class="finder" id="finder">
+      <img id="previewImg" alt="Выбранное фото блюда" hidden>
+      <button class="finder-btn" id="btnFinder" type="button" aria-label="Сфотографировать блюдо">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span class="ft">Сфотографируйте блюдо</span>
+        <span class="fs">Снимайте сверху, при дневном свете</span>
+      </button>
+      <i class="cr tl"></i><i class="cr tr"></i><i class="cr bl"></i><i class="cr br"></i>
+    </div>
+    <input id="camInput" type="file" accept="image/*" capture="environment" hidden>
+    <input id="fileInput" type="file" accept="image/*" hidden>
+
+    <div class="row">
+      <button class="btn" id="btnCam" type="button">Камера</button>
+      <button class="btn" id="btnPick" type="button">Галерея</button>
+    </div>
+
+    <div class="group">
+      <div class="cell">
+        <label for="hint">Уточнение</label>
+        <input id="hint" type="text" maxlength="200" placeholder="Например: без масла, 300 г">
+      </div>
+    </div>
+
+    <button class="btn primary wide" id="btnAnalyze" type="button" disabled>Определить калории</button>
+    <button class="btn wide" id="btnCancel" type="button" hidden>Отмена</button>
+    <p class="status" id="scanStatus" role="status"></p>
+
+    <div class="card stack" id="result" hidden>
+      <div>
+        <p class="eyebrow" id="resConf"></p>
+        <h2 id="resDish" style="margin-top:4px"></h2>
+      </div>
+      <div class="kc-row">
+        <div class="big"><span id="resKcal">0</span><small>ккал</small></div>
+        <div class="small" id="resPortion"></div>
+      </div>
+      <div>
+        <p class="small" style="margin-bottom:6px">Размер порции</p>
+        <div id="segScale"></div>
+      </div>
+      <div id="resTiles"></div>
+      <div id="resItemsWrap">
+        <p class="sec-h" style="padding-left:0">Состав</p>
+        <div class="group" id="resItems" style="background:var(--bg)"></div>
+      </div>
+      <p id="resComment" class="small"></p>
+      <p id="resTip" class="callout" hidden></p>
+      <div>
+        <p class="small" style="margin-bottom:6px">Приём пищи</p>
+        <div id="segMeal"></div>
+      </div>
+      <button class="btn primary wide" id="btnAdd" type="button">Добавить в дневник</button>
+    </div>
+
+    <p class="small" style="text-align:center">Фото отправляется в Claude для анализа и на странице не сохраняется. Оценка приблизительная: обычно ±15–25%.</p>
+  </section>
+
+  <!-- РЕЦЕПТЫ -->
+  <section id="view-recipes" class="stack view" hidden>
+    <p class="lead" id="recLead"></p>
+
+    <div class="card stack" id="menuCard">
+      <div>
+        <h3>Меню на день</h3>
+        <p class="small" style="margin-top:2px">Подберём завтрак, обед, ужин и перекусы под вашу дневную цель.</p>
+      </div>
+      <button class="btn primary wide" id="btnMenu" type="button">Собрать меню</button>
+      <div id="menuOut" class="stack" hidden></div>
+    </div>
+
+    <div class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Курица, гречка, творог" aria-label="Поиск рецептов" autocomplete="off">
+    </div>
+    <div id="segFilter"></div>
+    <div id="recipeList"></div>
+    <p class="small" style="text-align:center">Значения рассчитаны на одну порцию по таблицам состава продуктов. Реальные цифры зависят от продуктов и способа приготовления.</p>
+  </section>
+
+  <!-- ДНЕВНИК -->
+  <section id="view-diary" class="stack view" hidden>
+    <div class="card hero">
+      <div class="ring">
+        <svg viewBox="0 0 148 148" width="148" height="148" aria-hidden="true">
+          <circle class="ring-bg" cx="74" cy="74" r="62"/>
+          <circle class="ring-fg" id="ringFg" cx="74" cy="74" r="62" transform="rotate(-90 74 74)"/>
+        </svg>
+        <div class="ring-c"><b id="ringNum">0</b><span id="ringLbl">осталось</span></div>
+      </div>
+      <div class="mprog" id="mprog"></div>
+    </div>
+    <p class="small" style="margin-top:-8px;text-align:center">Съедено <b id="eaten" style="color:var(--label)">0</b> из <b id="goalNow" style="color:var(--label)">1600</b> ккал. Цели по БЖУ: белки 30%, жиры 28%, углеводы 42% калорий.</p>
+
+    <div id="entries" class="stack"></div>
+
+    <div>
+      <p class="sec-h">Добавить вручную</p>
+      <form class="group" id="manual" autocomplete="off">
+        <div class="cell"><label for="mName">Название</label><input id="mName" type="text" maxlength="80" required placeholder="Банан"></div>
+        <div class="cell"><label for="mKcal">Калории</label><input id="mKcal" type="number" inputmode="numeric" min="1" max="3000" required placeholder="105"></div>
+        <div class="cell col"><div id="segManual"></div></div>
+        <div class="cell col"><button class="btn primary wide" type="submit">Добавить</button></div>
+      </form>
+    </div>
+
+    <details class="group" id="goalBox">
+      <summary><span>Дневная цель</span><span class="val" id="goalLbl">1600 ккал</span></summary>
+      <div class="goal-body">
+        <div class="group">
+          <div class="cell"><label for="goalInput">Ккал в день</label><input id="goalInput" type="number" inputmode="numeric" min="800" max="5000" step="10"></div>
+        </div>
+        <button class="btn wide" id="goalSave" type="button">Сохранить цель</button>
+        <p class="sec-h" style="padding:8px 0 0">Рассчитать по формуле Миффлина — Сан Жеора</p>
+        <div class="group">
+          <div class="cell"><label for="cSex">Пол</label><select id="cSex"><option value="f">Женский</option><option value="m">Мужской</option></select></div>
+          <div class="cell"><label for="cAge">Возраст</label><input id="cAge" type="number" inputmode="numeric" min="14" max="90" placeholder="30"></div>
+          <div class="cell"><label for="cW">Вес, кг</label><input id="cW" type="number" inputmode="decimal" min="30" max="300" placeholder="70"></div>
+          <div class="cell"><label for="cH">Рост, см</label><input id="cH" type="number" inputmode="numeric" min="120" max="230" placeholder="170"></div>
+          <div class="cell"><label for="cAct">Активность</label>
+            <select id="cAct">
+              <option value="1.2">Сидячая</option>
+              <option value="1.375" selected>Лёгкая</option>
+              <option value="1.55">Средняя</option>
+              <option value="1.725">Высокая</option>
+            </select></div>
+          <div class="cell"><label for="cDef">Дефицит</label>
+            <select id="cDef"><option value="10">10%</option><option value="15" selected>15%</option><option value="20">20%</option></select></div>
+        </div>
+        <p class="small">Активность: сидячая, лёгкая (1–3 тренировки в неделю), средняя (3–5), высокая (6–7).</p>
+        <button class="btn wide" id="calcBtn" type="button">Рассчитать</button>
+        <div id="calcOut" class="stack" aria-live="polite"></div>
+        <p class="small">Это ориентир, а не медицинская рекомендация. При хронических заболеваниях, беременности и лактации планируйте питание вместе с врачом. Записи дневника хранятся в этом браузере.</p>
+      </div>
+    </details>
+
+    <details class="group" id="a2hs">
+      <summary><span>На главный экран</span><span class="val">ярлык</span></summary>
+      <div class="goal-body">
+        <div class="group">
+          <div class="cell col"><b>iPhone и iPad, Safari</b><span class="small">Нажмите «Поделиться», затем «На экран “Домой”».</span></div>
+          <div class="cell col"><b>Android, Chrome</b><span class="small">Меню ⋮, затем «Добавить на главный экран» или «Установить приложение».</span></div>
+          <div class="cell col"><b>Компьютер</b><span class="small">Chrome: меню ⋮, затем «Создать ярлык» (в разделе сохранения и общего доступа). Safari на Mac: «Файл», затем «Добавить в Dock».</span></div>
+        </div>
+        <p class="small">Ярлык открывает эту страницу в Claude, поэтому скан по фото работает, а иконку выбирает браузер. Отдельное приложение со своей иконкой и быстрыми действиями «Скан», «Рецепты», «Сегодня» собрано в пакете, который я отправил в чат.</p>
+      </div>
+    </details>
+  </section>
+</div>
+
+<nav class="nav" aria-label="Разделы">
+  <div class="nav-in">
+    <a href="#scan" data-nav="scan">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      Скан
+    </a>
+    <a href="#recipes" data-nav="recipes">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg>
+      Рецепты
+    </a>
+    <a href="#diary" data-nav="diary">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+      Сегодня
+    </a>
+  </div>
+</nav>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="scrim" id="scrim"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" tabindex="-1" id="panel">
+    <div class="grab"></div>
+    <button class="close" id="sheetClose" type="button" aria-label="Закрыть">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12"/></svg>
+    </button>
+    <div class="panel-body" id="sheetBody"></div>
+    <div class="panel-bar"><button class="btn primary wide" id="sheetAdd" type="button">Добавить в дневник</button></div>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const MEALS = ['Завтрак','Обед','Ужин','Перекус'];
+const MKEY = {'Завтрак':'b','Обед':'l','Ужин':'d','Перекус':'s'};
+const nf = n => Math.round(n).toLocaleString('ru-RU');
+const num = v => Math.max(0, Math.round(Number(v) || 0));
+const plural = (n, a, b, c) => { const m = n % 100, k = n % 10; return (m > 10 && m < 20) ? c : k === 1 ? a : (k >= 2 && k <= 4) ? b : c; };
+
+function el(tag, props, kids){
+  const n = document.createElement(tag);
+  if(props){
+    for(const k in props){
+      const v = props[k];
+      if(v == null || v === false) continue;
+      if(k === 'class') n.className = v;
+      else if(k === 'text') n.textContent = v;
+      else if(k.slice(0,2) === 'on') n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? '' : v);
+    }
+  }
+  (kids || []).forEach(c => { if(c != null) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  return n;
+}
+const ICON = {
+  b:'<path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 5.5V8M5.2 9.2l1.7 1.7M18.8 9.2l-1.7 1.7"/>',
+  l:'<path d="M3.5 11h17a8.5 8.5 0 0 1-17 0z"/><path d="M9 7.5c0-1.5 1.2-1.5 1.2-3M14 7.5c0-1.5 1.2-1.5 1.2-3"/>',
+  d:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  s:'<path d="M12 8.5c-2-2-7-1.5-7 3.5s3 8 5 8c1 0 1.5-.5 2-.5s1 .5 2 .5c2 0 5-3 5-8s-5-5.5-7-3.5z"/><path d="M12 8.5c0-2 1-3.5 3-4.5"/>'
+};
+function icon(key, size){
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.setAttribute('viewBox','0 0 24 24'); s.setAttribute('width', size || 26); s.setAttribute('height', size || 26);
+  s.setAttribute('fill','none'); s.setAttribute('stroke','currentColor'); s.setAttribute('stroke-width','1.8');
+  s.setAttribute('stroke-linecap','round'); s.setAttribute('stroke-linejoin','round'); s.setAttribute('aria-hidden','true');
+  s.innerHTML = ICON[key];
+  return s;
+}
+function chevron(){
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.setAttribute('viewBox','0 0 24 24'); s.setAttribute('width','18'); s.setAttribute('height','18');
+  s.setAttribute('fill','none'); s.setAttribute('stroke','currentColor'); s.setAttribute('stroke-width','2.2');
+  s.setAttribute('stroke-linecap','round'); s.setAttribute('stroke-linejoin','round'); s.setAttribute('aria-hidden','true');
+  s.setAttribute('class','chev'); s.innerHTML = '<path d="M9 5l7 7-7 7"/>';
+  return s;
+}
+function tile(meal, small){ return el('span', {class:'tile t-' + MKEY[meal] + (small ? ' sm' : '')}, [icon(MKEY[meal], small ? 20 : 28)]); }
+
+/* сегментированный переключатель */
+function seg(box, opts, init, onChange, label){
+  box.textContent = '';
+  box.className = 'seg';
+  box.setAttribute('role','group'); if(label) box.setAttribute('aria-label', label);
+  let cur = init;
+  const btns = opts.map(o => el('button', {type:'button', text:o.t, 'aria-pressed':String(o.v === cur), onclick:() => {
+    cur = o.v; sync(); if(onChange) onChange(cur);
+  }}));
+  function sync(){ btns.forEach((b, i) => b.setAttribute('aria-pressed', String(opts[i].v === cur))); }
+  btns.forEach(b => box.appendChild(b));
+  return {get:() => cur, set:v => { cur = v; sync(); }};
+}
+
+/* ---------- хранилище (только удобство этого браузера) ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const dayKey = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+let goal = Number(store.get('tarelka.goal', 1600)) || 1600;
+let curKey = dayKey();
+let log = store.get('tarelka.log.' + curKey, []);
+if(!Array.isArray(log)) log = [];
+function todayLog(){
+  const k = dayKey();
+  if(k !== curKey){ curKey = k; log = store.get('tarelka.log.' + k, []); if(!Array.isArray(log)) log = []; }
+  return log;
+}
+function saveLog(){ store.set('tarelka.log.' + curKey, log); }
+function totals(){
+  return todayLog().reduce((a, e) => ({kcal:a.kcal+e.kcal, p:a.p+e.p, f:a.f+e.f, c:a.c+e.c}), {kcal:0,p:0,f:0,c:0});
+}
+function addEntry(e, quiet){
+  todayLog().push({id: String(Date.now()) + Math.floor(Math.random()*100000), meal:e.meal, name:e.name, kcal:num(e.kcal), p:num(e.p), f:num(e.f), c:num(e.c)});
+  saveLog(); updateMini(); if(!quiet) toast('Добавлено в дневник');
+}
+function defaultMeal(){
+  const h = new Date().getHours();
+  return h < 11 ? 'Завтрак' : h < 16 ? 'Обед' : h < 18 ? 'Перекус' : 'Ужин';
+}
+let toastT;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function updateMini(){
+  const t = totals();
+  $('miniNum').textContent = nf(t.kcal);
+  const fg = $('miniFg');
+  fg.style.strokeDashoffset = String(113.1 * (1 - Math.min(t.kcal / goal, 1)));
+  fg.classList.toggle('over', t.kcal > goal);
+}
+
+/* ---------- общие виджеты ---------- */
+function macroTiles(p, f, c){
+  const pk = p*4, fk = f*9, ck = c*4, s = (pk+fk+ck) || 1;
+  const wrap = el('div', {class:'mtiles'});
+  [['p','Белки',p,pk],['f','Жиры',f,fk],['c','Углеводы',c,ck]].forEach(x => {
+    const pct = Math.round(x[3] / s * 100);
+    const bar = el('i', {class:x[0]}); bar.style.width = pct + '%';
+    wrap.appendChild(el('div', {class:'mt'}, [
+      el('span', {class:'ml'}, [el('i', {class:'dot ' + x[0]}), x[1]]),
+      el('b', {text:nf(x[2]) + ' г'}),
+      el('span', {class:'track'}, [bar]),
+      el('span', {class:'mp', text:pct + '% ккал'})
+    ]));
+  });
+  return wrap;
+}
+function miniMacros(r){
+  return el('span', {class:'rb'}, [
+    el('span', {}, [el('i', {class:'dot p'}), 'Б ' + r.p]),
+    el('span', {}, [el('i', {class:'dot f'}), 'Ж ' + r.f]),
+    el('span', {}, [el('i', {class:'dot c'}), 'У ' + r.c])
+  ]);
+}
+function fillSeg(box, init, onChange, label){ return seg(box, MEALS.map(m => ({v:m, t:m})), init, onChange, label); }
+
+/* ---------- навигация ---------- */
+const views = ['scan','recipes','diary'];
+const TITLES = {scan:'Скан', recipes:'Рецепты', diary:'Сегодня'};
+function route(){
+  const h = location.hash.slice(1);
+  const v = views.includes(h) ? h : 'scan';
+  views.forEach(n => {
+    $('view-' + n).hidden = n !== v;
+    document.querySelector('[data-nav="' + n + '"]').setAttribute('aria-current', n === v ? 'page' : 'false');
+  });
+  $('title').textContent = TITLES[v];
+  $('dateLbl').textContent = new Date().toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
+  if(v === 'diary') renderDiary();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', () => { closeSheet(true); route(); });
+
+/* ---------- СКАН ---------- */
+let sample = null, imgInfo = null, file = null, previewUrl = null, ctl = null, base = null, scale = 1, locked = false;
+let segScale, segMeal;
+
+function setStatus(msg, err, busy){
+  const s = $('scanStatus');
+  s.textContent = '';
+  s.className = 'status' + (err ? ' err' : '');
+  if(busy) s.appendChild(el('span', {class:'spin', 'aria-hidden':'true'}));
+  s.appendChild(document.createTextNode(msg || ''));
+}
+function refreshAnalyze(){
+  $('btnAnalyze').disabled = !file || locked || !!ctl;
+  $('btnAnalyze').hidden = !!ctl;
+  $('btnCancel').hidden = !ctl;
+}
+function lockScan(msg){ locked = true; setStatus(msg, true); refreshAnalyze(); }
+
+function errorCopy(e){
+  switch(e && e.code){
+    case 'not_granted': return 'Чтобы распознавать фото, разрешите странице пользоваться Claude.';
+    case 'rate_limited': return e.reason === 'usage_limit' ? 'Достигнут лимит использования Claude. Попробуйте позже.' : 'Слишком много запросов подряд. Подождите минуту.';
+    case 'image_rejected': return 'Это фото не подошло. Выберите другое: JPEG, PNG или WebP.';
+    case 'invalid_json': case 'empty_completion': case 'refused': return 'Не удалось разобрать ответ. Попробуйте другое фото или добавьте уточнение.';
+    case 'session_expired': return 'Сессия истекла. Войдите в Claude заново и откройте страницу.';
+    case 'sampling_disabled': case 'capability_disabled': case 'capability_removed': case 'not_declared': case 'images_unavailable': return 'Распознавание по фото здесь недоступно.';
+    default: return 'Что-то пошло не так. Попробуйте ещё раз.';
+  }
+}
+const PERMANENT = ['not_granted','sampling_disabled','capability_disabled','capability_removed','not_declared','images_unavailable'];
+
+function onFile(f){
+  if(!f) return;
+  if(imgInfo && f.size > imgInfo.maxInputBytes){ setStatus('Файл слишком большой. Выберите фото поменьше.', true); return; }
+  file = f;
+  if(previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = URL.createObjectURL(f);
+  $('previewImg').src = previewUrl;
+  $('previewImg').hidden = false;
+  $('btnFinder').hidden = true;
+  $('finder').classList.add('has');
+  $('result').hidden = true;
+  base = null;
+  setStatus('');
+  refreshAnalyze();
+}
+
+function buildPrompt(hint){
+  return [
+    'Ты нутрициолог. На фото еда. Определи блюдо и оцени калорийность и БЖУ той порции, которая видна на фото.',
+    'Размер порции оценивай по размеру тарелки, приборов и других предметов в кадре. Каждый заметный компонент назови отдельной строкой.',
+    hint ? 'Уточнение пользователя (обязательно учти): ' + hint : '',
+    'Ответь только JSON-объектом без пояснений, в таком формате:',
+    '{"is_food":true,"dish":"название блюда по-русски","portion_g":350,"kcal":520,"protein":30,"fat":20,"carbs":55,"items":[{"name":"компонент","grams":150,"kcal":240}],"confidence":"low|medium|high","comment":"1-2 предложения: как оценена порция и что может изменить цифры","tip":"один короткий совет, как сделать блюдо легче, либо пустая строка"}',
+    'Все числа целые. Белки, жиры и углеводы даны в граммах на всю порцию. Сумма kcal по компонентам должна примерно совпадать с общим kcal. Если на фото нет еды, верни {"is_food":false}.'
+  ].filter(Boolean).join('\n');
+}
+
+async function analyze(){
+  if(!sample || !file || ctl || locked) return;
+  ctl = new AbortController();
+  refreshAnalyze();
+  setStatus('Определяю блюдо и размер порции…', false, true);
+  try{
+    const hint = $('hint').value.trim().slice(0, 200);
+    const data = await sample.json(buildPrompt(hint), {images:file, signal:ctl.signal});
+    handleResult(data);
+  }catch(e){
+    if(e && e.code === 'cancelled'){ setStatus(''); }
+    else{
+      setStatus(errorCopy(e), true);
+      if(e && PERMANENT.includes(e.code)) locked = true;
+    }
+  }finally{
+    ctl = null;
+    refreshAnalyze();
+  }
+}
+
+function handleResult(d){
+  if(!d || typeof d !== 'object' || d.is_food === false){
+    setStatus('На фото не видно еды. Попробуйте снять блюдо ближе и при хорошем свете.', true);
+    $('result').hidden = true; return;
+  }
+  const items = (Array.isArray(d.items) ? d.items : []).slice(0, 12).map(i => ({
+    name: String((i && i.name) || '').slice(0, 80), grams: num(i && i.grams), kcal: num(i && i.kcal)
+  })).filter(i => i.name);
+  base = {
+    dish: String(d.dish || 'Блюдо').slice(0, 80),
+    portion: num(d.portion_g), kcal: num(d.kcal), p: num(d.protein), f: num(d.fat), c: num(d.carbs),
+    conf: ['low','medium','high'].includes(d.confidence) ? d.confidence : 'medium',
+    comment: String(d.comment || '').slice(0, 400), tip: String(d.tip || '').slice(0, 300), items: items
+  };
+  if(!base.kcal){ setStatus('Не удалось оценить калорийность. Попробуйте другое фото.', true); $('result').hidden = true; return; }
+  scale = 1; segScale.set(1);
+  segMeal.set(defaultMeal());
+  setStatus('');
+  renderResult();
+  $('result').hidden = false;
+  $('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderResult(){
+  if(!base) return;
+  const S = v => Math.round(v * scale);
+  const conf = {low:'невысокая', medium:'средняя', high:'хорошая'}[base.conf];
+  $('resConf').textContent = 'Оценка по фото · точность ' + conf;
+  $('resDish').textContent = base.dish;
+  $('resKcal').textContent = nf(S(base.kcal));
+  $('resPortion').textContent = base.portion ? '≈ ' + nf(S(base.portion)) + ' г' : '';
+  const tiles = $('resTiles'); tiles.textContent = '';
+  tiles.appendChild(macroTiles(S(base.p), S(base.f), S(base.c)));
+  const list = $('resItems'); list.textContent = '';
+  base.items.forEach(i => list.appendChild(el('div', {class:'cell'}, [
+    el('span', {text:i.name, style:'min-width:0;overflow-wrap:anywhere'}),
+    el('span', {class:'item-n'}, [el('span', {text: i.grams ? nf(S(i.grams)) + ' г' : ''}), el('b', {text:nf(S(i.kcal))})])
+  ])));
+  $('resItemsWrap').hidden = !base.items.length;
+  $('resComment').textContent = base.comment;
+  $('resComment').hidden = !base.comment;
+  $('resTip').textContent = base.tip ? 'Совет: ' + base.tip : '';
+  $('resTip').hidden = !base.tip;
+}
+
+/* ---------- РЕЦЕПТЫ ---------- */
+const RECIPES = [
+  /* Завтраки */
+  {name:'Омлет с помидором', meal:'Завтрак', time:10, kcal:215, p:13, f:16, c:4,
+   ing:['Яйца — 2 шт.','Помидор — 1 небольшой (80 г)','Растительное масло — 1 ч. л.','Соль'],
+   steps:['Взбейте яйца с щепоткой соли.','Нарежьте помидор кубиками и обжарьте на масле 1 минуту.','Залейте яйцами, накройте крышкой и готовьте 4 минуты на малом огне.'],
+   tip:'На антипригарной сковороде масло можно убрать: это минус 45 ккал.'},
+  {name:'Овсянка на молоке с бананом', meal:'Завтрак', time:10, kcal:280, p:10, f:7, c:44,
+   ing:['Овсяные хлопья — 40 г','Молоко 2,5% — 150 мл','Банан — ½ шт. (60 г)','Соль — щепотка'],
+   steps:['Доведите молоко до кипения и всыпьте хлопья.','Варите 5–7 минут, помешивая.','Добавьте нарезанный банан и накройте крышкой на 2 минуты.'],
+   tip:'Если заменить молоко водой, порция станет легче примерно на 80 ккал.'},
+  {name:'Сырники из творога', meal:'Завтрак', time:20, kcal:330, p:31, f:15, c:17,
+   ing:['Творог 5% — 150 г','Яйцо — ½ шт.','Мука — 2 ст. л. (20 г)','Масло для сковороды — 1 ч. л.'],
+   steps:['Разомните творог с яйцом.','Добавьте муку и замесите густое тесто.','Сформируйте 3 сырника.','Обжарьте на масле по 2–3 минуты с каждой стороны.'],
+   tip:'Запеките сырники в духовке 15 минут при 180 °C: масло не понадобится.'},
+  {name:'Гречка с яйцом и огурцом', meal:'Завтрак', time:20, kcal:255, p:13, f:7, c:34,
+   ing:['Гречка — 50 г (сухая)','Яйцо — 1 шт.','Огурец — 100 г','Соль'],
+   steps:['Промойте гречку, залейте 100 мл воды и варите 15 минут под крышкой.','Отварите яйцо 8 минут.','Нарежьте яйцо и огурец, подавайте с кашей.'],
+   tip:'Залейте гречку кипятком с вечера: утром останется только разогреть.'},
+  {name:'Бутерброды с яйцом и огурцом', meal:'Завтрак', time:10, kcal:220, p:12, f:6, c:29,
+   ing:['Ржаной хлеб — 2 ломтика (60 г)','Яйцо варёное — 1 шт.','Огурец — 60 г','Зелень, соль'],
+   steps:['Отварите яйцо вкрутую, это 8 минут.','Нарежьте яйцо и огурец кружками.','Выложите на хлеб и посыпьте зеленью.'],
+   tip:'Хлеб можно подсушить в тостере или на сухой сковороде.'},
+  {name:'Овсянка с кефиром и яблоком', meal:'Завтрак', time:5, kcal:250, p:10, f:5, c:40,
+   ing:['Овсяные хлопья — 40 г','Кефир 1% — 150 мл','Яблоко — 1 небольшое (100 г)','Корица — щепотка'],
+   steps:['Смешайте хлопья с кефиром в банке.','Добавьте натёртое яблоко и корицу.','Уберите в холодильник на 6–8 часов, лучше на ночь.'],
+   tip:'Утром можно есть холодной или разогреть за минуту.'},
+  {name:'Банановые оладьи из трёх продуктов', meal:'Завтрак', time:15, kcal:390, p:19, f:14, c:46,
+   ing:['Банан — 1 шт. (100 г)','Яйца — 2 шт.','Овсяные хлопья — 40 г','Масло для сковороды — несколько капель'],
+   steps:['Разомните банан вилкой или пробейте блендером.','Добавьте яйца и хлопья, перемешайте и оставьте на 5 минут.','Выпекайте 4 небольшие оладьи по 2 минуты с каждой стороны.'],
+   tip:'Сахар не нужен: спелый банан даёт достаточно сладости.'},
+
+  /* Обеды */
+  {name:'Курица с гречкой и овощами', meal:'Обед', time:30, kcal:440, p:43, f:10, c:43,
+   ing:['Куриная грудка — 150 г','Гречка — 60 г (сухая)','Огурец и помидор — 150 г','Растительное масло — 1 ч. л.','Соль, перец, паприка'],
+   steps:['Промойте гречку и варите 15 минут в 120 мл воды.','Посолите грудку, посыпьте специями и запеките 20 минут при 190 °C или обжарьте на сковороде.','Нарежьте овощи и заправьте маслом.','Подавайте всё вместе.'],
+   tip:'Гречку можно заменить бурым рисом или булгуром в том же весе.'},
+  {name:'Борщ с курицей', meal:'Обед', time:50, kcal:300, p:22, f:7, c:37,
+   ing:['Куриная грудка — 70 г','Картофель — 100 г','Свёкла — 80 г','Капуста — 100 г','Морковь — 40 г','Лук — 30 г','Томатная паста — 1 ст. л.','Масло — 1 ч. л.','Вода — 400 мл'],
+   steps:['Сварите курицу в воде 20 минут, достаньте и нарежьте.','Положите в бульон картофель.','Обжарьте лук, морковь и свёклу с томатной пастой 5 минут и добавьте капусту.','Варите 15 минут, верните курицу и посолите.'],
+   tip:'Варите кастрюлю сразу на 3–4 порции: на второй день борщ вкуснее.'},
+  {name:'Макароны с тунцом и помидорами', meal:'Обед', time:20, kcal:395, p:27, f:7, c:56,
+   ing:['Макароны — 70 г (сухие)','Тунец в собственном соку — 80 г','Помидоры — 150 г','Чеснок — 1 зубчик','Масло — 1 ч. л.'],
+   steps:['Отварите макароны на минуту меньше, чем написано на упаковке.','Обжарьте чеснок на масле 30 секунд, добавьте помидоры и тушите 5 минут.','Добавьте тунец и макароны, прогрейте минуту.'],
+   tip:'Берите макароны из твёрдых сортов пшеницы: они дольше держат сытость.'},
+  {name:'Плов с курицей', meal:'Обед', time:45, kcal:420, p:33, f:8, c:53,
+   ing:['Рис — 60 г (сухой)','Куриная грудка — 120 г','Морковь — 60 г','Лук — 40 г','Масло — 1 ч. л.','Соль, специи для плова'],
+   steps:['Нарежьте курицу кубиками и обжарьте с луком 5 минут.','Добавьте тёртую морковь и жарьте ещё 3 минуты.','Всыпьте промытый рис, специи и соль, влейте 120 мл воды.','Томите под крышкой на малом огне 20 минут и дайте постоять 10 минут.'],
+   tip:'Пропаренный или бурый рис дольше сохраняет сытость.'},
+  {name:'Тушёная капуста с курицей', meal:'Обед', time:40, kcal:375, p:36, f:8, c:39,
+   ing:['Капуста — 250 г','Картофель — 150 г','Куриная грудка — 120 г','Морковь — 50 г','Масло — 1 ч. л.','Соль, лавровый лист'],
+   steps:['Нарежьте курицу и картофель кубиками.','Обжарьте курицу 4 минуты и добавьте морковь.','Положите картофель и нашинкованную капусту, влейте 100 мл воды.','Тушите под крышкой 25 минут и посолите в конце.'],
+   tip:'Ложка томатной пасты добавит кислинку примерно за 15 ккал.'},
+  {name:'Чечевичный суп', meal:'Обед', time:30, kcal:315, p:16, f:6, c:49,
+   ing:['Красная чечевица — 50 г','Картофель — 100 г','Морковь — 60 г','Лук — 40 г','Масло — 1 ч. л.','Вода — 400 мл','Соль, куркума'],
+   steps:['Обжарьте лук и морковь на масле 4 минуты.','Добавьте картофель кубиками и промытую чечевицу, залейте водой.','Варите 20 минут, посолите, добавьте куркуму.','При желании пробейте блендером.'],
+   tip:'Красная чечевица не требует замачивания и сама разваривается в густой суп.'},
+  {name:'Куриный суп с вермишелью', meal:'Обед', time:30, kcal:260, p:24, f:2, c:36,
+   ing:['Куриная грудка — 80 г','Картофель — 100 г','Морковь — 40 г','Лук — 30 г','Вермишель — 20 г','Вода — 400 мл','Зелень, соль'],
+   steps:['Варите курицу 20 минут, затем нарежьте.','Добавьте картофель, морковь и лук, варите 10 минут.','Всыпьте вермишель на 3 минуты и верните курицу.','Посыпьте зеленью.'],
+   tip:'Не обжаривайте овощи, и суп получится заметно легче.'},
+
+  /* Ужины */
+  {name:'Минтай с картофелем в духовке', meal:'Ужин', time:40, kcal:355, p:35, f:8, c:36,
+   ing:['Филе минтая — 180 г','Картофель — 200 г','Лук — 40 г','Масло — 1 ч. л.','Лимон — ¼ шт.','Соль, перец'],
+   steps:['Нарежьте картофель дольками, а лук кольцами.','Выложите в форму, сбрызните маслом и запекайте 20 минут при 200 °C.','Добавьте рыбу, посолите и сбрызните лимоном.','Запекайте ещё 15 минут.'],
+   tip:'Накройте форму фольгой, чтобы рыба осталась сочной.'},
+  {name:'Куриные котлеты с капустным салатом', meal:'Ужин', time:35, kcal:305, p:39, f:9, c:16,
+   ing:['Куриная грудка — 150 г','Овсяные хлопья — 10 г (1 ст. л.)','Лук — 30 г','Капуста — 150 г','Масло — 1 ч. л.','Соль, перец'],
+   steps:['Прокрутите грудку с луком, добавьте хлопья, соль и перец и вымесите.','Сформируйте 2 котлеты и запекайте 20 минут при 190 °C.','Нашинкуйте капусту, посолите, разомните руками и заправьте маслом.'],
+   tip:'Если фарш получился сухим, добавьте 1 ст. л. кефира.'},
+  {name:'Курица с цукини и помидорами', meal:'Ужин', time:35, kcal:285, p:38, f:9, c:13,
+   ing:['Куриная грудка — 150 г','Цукини — 200 г','Помидоры — 100 г','Масло — 1 ч. л.','Чеснок — 1 зубчик','Соль, сушёные травы'],
+   steps:['Нарежьте курицу, цукини и помидоры крупными кусками.','Смешайте в форме с маслом, чесноком и травами.','Запекайте 25 минут при 200 °C.'],
+   tip:'Цукини можно заменить баклажаном или сладким перцем.'},
+  {name:'Творожная запеканка', meal:'Ужин', time:40, kcal:355, p:42, f:16, c:10,
+   ing:['Творог 5% — 200 г','Яйцо — 1 шт.','Овсяные хлопья — 10 г (1 ст. л.)','Корица или ванилин'],
+   steps:['Измельчите хлопья и смешайте с творогом и яйцом.','Выложите массу в форму.','Запекайте 25 минут при 180 °C.'],
+   tip:'Подавайте с горстью ягод: сладость будет без сахара.'},
+  {name:'Гречка с грибами и луком', meal:'Ужин', time:25, kcal:320, p:13, f:10, c:42,
+   ing:['Гречка — 60 г (сухая)','Шампиньоны — 150 г','Лук — 50 г','Масло — 1 ч. л.','Сметана 15% — 1 ст. л. (15 г)','Соль'],
+   steps:['Отварите гречку 15 минут в 120 мл воды.','Обжарьте лук 3 минуты, добавьте нарезанные грибы и жарьте 7 минут.','Смешайте с гречкой и подавайте со сметаной.'],
+   tip:'Сметану можно заменить натуральным йогуртом.'},
+  {name:'Салат с тунцом и яйцом', meal:'Ужин', time:10, kcal:245, p:26, f:11, c:9,
+   ing:['Тунец в собственном соку — 80 г','Яйцо варёное — 1 шт.','Огурец — 100 г','Помидор — 100 г','Капуста — 50 г','Масло — 1 ч. л.','Лимонный сок'],
+   steps:['Отварите яйцо 8 минут.','Нарежьте овощи и яйцо, добавьте тунец без жидкости.','Заправьте маслом и лимонным соком.'],
+   tip:'Ломтик хлеба добавит около 70 ккал, если ужин нужен сытнее.'},
+  {name:'Рагу с индейкой и овощами', meal:'Ужин', time:40, kcal:375, p:38, f:9, c:35,
+   ing:['Филе индейки — 150 г','Картофель — 150 г','Цукини — 100 г','Морковь — 50 г','Масло — 1 ч. л.','Соль, перец'],
+   steps:['Нарежьте всё кубиками.','Обжарьте индейку 5 минут.','Добавьте морковь и картофель, влейте 150 мл воды и тушите 15 минут.','Положите цукини и тушите ещё 10 минут.'],
+   tip:'Индейку можно заменить куриной грудкой в том же весе.'},
+
+  /* Перекусы */
+  {name:'Банан и кефир', meal:'Перекус', time:2, kcal:165, p:7, f:2, c:29,
+   ing:['Банан — 1 шт. (100 г)','Кефир 1% — 200 мл'],
+   steps:['Съешьте банан, запивая кефиром, или пробейте всё блендером.'],
+   tip:'Хороший вариант после тренировки: есть и белок, и быстрые углеводы.'},
+  {name:'Два яйца и огурец', meal:'Перекус', time:10, kcal:170, p:13, f:11, c:4,
+   ing:['Яйца — 2 шт.','Огурец — 100 г','Соль'],
+   steps:['Варите яйца 8 минут и остудите.','Нарежьте огурец и подавайте с яйцами.'],
+   tip:'Варёные яйца в скорлупе хранятся в холодильнике до 5 дней.'},
+  {name:'Творог с яблоком', meal:'Перекус', time:3, kcal:165, p:17, f:5, c:12,
+   ing:['Творог 5% — 100 г','Яблоко — 100 г','Корица'],
+   steps:['Нарежьте яблоко кубиками.','Смешайте с творогом и посыпьте корицей.'],
+   tip:'Белок в этом перекусе помогает дотянуть до ужина.'}
+];
+RECIPES.forEach((r, i) => { r.id = i; });
+let filterMeal = 'Все', query = '', segFilter, segManual;
+
+function recipeRow(r){
+  return el('button', {class:'rrow', type:'button', onclick:() => openSheet(r)}, [
+    tile(r.meal),
+    el('span', {class:'r-mid'}, [
+      el('span', {class:'rn', text:r.name}),
+      el('span', {class:'rm', text:r.meal + ' · ' + r.time + ' мин'}),
+      miniMacros(r)
+    ]),
+    el('span', {class:'r-k'}, [el('b', {text:String(r.kcal)}), el('span', {text:'ккал'})]),
+    chevron()
+  ]);
+}
+function renderRecipes(){
+  const box = $('recipeList'); box.textContent = '';
+  const q = query.trim().toLowerCase();
+  const list = RECIPES.filter(r => (filterMeal === 'Все' || r.meal === filterMeal) &&
+    (!q || (r.name + ' ' + r.ing.join(' ')).toLowerCase().includes(q)));
+  if(!list.length){
+    box.appendChild(el('div', {class:'group'}, [el('p', {class:'empty', text:'Ничего не нашлось. Попробуйте другое слово или приём пищи.'})]));
+    return;
+  }
+  if(filterMeal === 'Все' && !q){
+    MEALS.forEach(m => {
+      const items = list.filter(r => r.meal === m);
+      if(!items.length) return;
+      box.appendChild(el('div', {style:'margin-bottom:20px'}, [
+        el('p', {class:'sec-h', text:m === 'Завтрак' ? 'Завтраки' : m === 'Обед' ? 'Обеды' : m === 'Ужин' ? 'Ужины' : 'Перекусы'}),
+        el('div', {class:'group'}, items.map(recipeRow))
+      ]));
+    });
+  }else{
+    box.appendChild(el('div', {class:'group'}, list.map(recipeRow)));
+  }
+}
+
+/* меню на день */
+let menu = null;
+function buildMenu(){
+  const by = m => RECIPES.filter(r => r.meal === m);
+  const B = by('Завтрак'), L = by('Обед'), D = by('Ужин'), S = by('Перекус');
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const tries = [];
+  for(let i = 0; i < 300; i++){
+    const items = [pick(B), pick(L), pick(D)];
+    let t = items.reduce((a, r) => a + r.kcal, 0);
+    S.slice().sort(() => Math.random() - 0.5).forEach(s => {
+      if(items.length < 5 && t + s.kcal <= goal + 50){ items.push(s); t += s.kcal; }
+    });
+    tries.push({items:items, t:t, score:Math.abs(goal - t)});
+  }
+  tries.sort((a, b) => a.score - b.score);
+  const m = tries[Math.floor(Math.random() * Math.min(8, tries.length))];
+  m.items.sort((a, b) => MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal));
+  return m;
+}
+function renderMenu(){
+  const out = $('menuOut');
+  if(!menu){ out.hidden = true; return; }
+  out.hidden = false; out.textContent = '';
+  const sum = menu.items.reduce((a, r) => ({p:a.p+r.p, f:a.f+r.f, c:a.c+r.c}), {p:0,f:0,c:0});
+  out.appendChild(el('div', {class:'menu-total'}, [
+    el('div', {class:'big'}, [String(nf(menu.t)), el('small', {text:'ккал'})]),
+    el('div', {class:'small', text:'цель ' + nf(goal) + ' ккал'})
+  ]));
+  out.appendChild(macroTiles(sum.p, sum.f, sum.c));
+  out.appendChild(el('div', {class:'group', style:'background:var(--bg)'}, menu.items.map(recipeRow)));
+  const diff = goal - menu.t;
+  if(diff > 150) out.appendChild(el('p', {class:'callout', text:'Это на ' + nf(diff) + ' ккал меньше вашей цели. Добавьте порцию гарнира, фрукт или ещё один перекус.'}));
+  out.appendChild(el('div', {class:'row'}, [
+    el('button', {class:'btn', type:'button', text:'Другое меню', onclick:() => { menu = buildMenu(); renderMenu(); }}),
+    el('button', {class:'btn primary', type:'button', text:'Всё в дневник', onclick:() => {
+      menu.items.forEach(r => addEntry({meal:r.meal, name:r.name, kcal:r.kcal, p:r.p, f:r.f, c:r.c}, true));
+      toast('Меню добавлено в дневник');
+    }})
+  ]));
+}
+
+/* лист рецепта */
+let sheetRecipe = null, sheetOpener = null, sheetTimer = null;
+function openSheet(r){
+  sheetRecipe = r; sheetOpener = document.activeElement;
+  const body = $('sheetBody'); body.textContent = '';
+  const t = el('span', {class:'tile t-' + MKEY[r.meal]}, [icon(MKEY[r.meal], 32)]);
+  body.appendChild(el('div', {class:'s-head'}, [
+    t,
+    el('div', {style:'min-width:0'}, [
+      el('p', {class:'eyebrow', text:r.meal + ' · ' + r.time + ' мин · 1 порция'}),
+      el('h2', {id:'sheetTitle', text:r.name, style:'margin-top:4px'})
+    ])
+  ]));
+  body.appendChild(el('div', {class:'big'}, [String(r.kcal), el('small', {text:'ккал'})]));
+  body.appendChild(macroTiles(r.p, r.f, r.c));
+  body.appendChild(el('div', {}, [
+    el('p', {class:'sec-h', text:'Ингредиенты'}),
+    el('div', {class:'group'}, r.ing.map(t => el('div', {class:'cell', text:t})))
+  ]));
+  body.appendChild(el('div', {}, [
+    el('p', {class:'sec-h', text:'Приготовление'}),
+    el('ol', {class:'group steps'}, r.steps.map(t => el('li', {text:t})))
+  ]));
+  body.appendChild(el('p', {class:'callout', text:'Совет: ' + r.tip}));
+  body.scrollTop = 0;
+  clearTimeout(sheetTimer);
+  const sh = $('sheet');
+  sh.hidden = false;
+  document.documentElement.style.overflow = 'hidden';
+  requestAnimationFrame(() => requestAnimationFrame(() => { sh.classList.add('open'); $('panel').focus({preventScroll:true}); }));
+}
+function closeSheet(instant){
+  const sh = $('sheet');
+  if(sh.hidden) return;
+  sh.classList.remove('open');
+  document.documentElement.style.overflow = '';
+  const done = () => { sh.hidden = true; };
+  clearTimeout(sheetTimer);
+  if(instant || window.matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+  else sheetTimer = setTimeout(done, 450);
+  if(sheetOpener && sheetOpener.focus && document.contains(sheetOpener)) sheetOpener.focus({preventScroll:true});
+  sheetRecipe = null;
+}
+document.addEventListener('keydown', e => {
+  const sh = $('sheet');
+  if(sh.hidden) return;
+  if(e.key === 'Escape'){ closeSheet(); return; }
+  if(e.key === 'Tab'){
+    const f = Array.from($('panel').querySelectorAll('button,a[href],input,select')).filter(x => !x.disabled && x.offsetParent !== null);
+    if(!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if(e.shiftKey && (document.activeElement === first || document.activeElement === $('panel'))){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+});
+
+/* ---------- ДНЕВНИК ---------- */
+const CIRC = 2 * Math.PI * 62;
+function mprogRow(label, cls, val, target){
+  const bar = el('i', {class:cls}); bar.style.width = Math.min(100, target ? val / target * 100 : 0) + '%';
+  return el('div', {class:'mp-row'}, [
+    el('div', {class:'mp-h'}, [
+      el('span', {}, [el('i', {class:'dot ' + cls}), label]),
+      el('span', {}, [el('b', {text:nf(val)}), ' / ' + nf(target) + ' г'])
+    ]),
+    el('span', {class:'track'}, [bar])
+  ]);
+}
+function renderDiary(){
+  const t = totals(), g = goal;
+  const left = g - t.kcal;
+  const fg = $('ringFg');
+  fg.setAttribute('stroke-dasharray', String(CIRC));
+  fg.style.strokeDashoffset = String(CIRC * (1 - Math.min(t.kcal / g, 1)));
+  fg.classList.toggle('over', left < 0);
+  $('ringNum').textContent = nf(Math.abs(left));
+  $('ringLbl').textContent = left < 0 ? 'сверх цели' : 'осталось';
+  $('eaten').textContent = nf(t.kcal);
+  $('goalNow').textContent = nf(g);
+  const mp = $('mprog'); mp.textContent = '';
+  mp.appendChild(mprogRow('Белки', 'p', t.p, g * 0.30 / 4));
+  mp.appendChild(mprogRow('Жиры', 'f', t.f, g * 0.28 / 9));
+  mp.appendChild(mprogRow('Углеводы', 'c', t.c, g * 0.42 / 4));
+  $('goalLbl').textContent = nf(g) + ' ккал';
+  if(document.activeElement !== $('goalInput')) $('goalInput').value = String(g);
+
+  const box = $('entries'); box.textContent = '';
+  const entries = todayLog();
+  if(!entries.length){
+    box.appendChild(el('div', {class:'group'}, [el('div', {class:'empty'}, [
+      el('p', {text:'Сегодня пока пусто. Отсканируйте блюдо или выберите рецепт.', style:'margin-bottom:12px'}),
+      el('div', {class:'row'}, [
+        el('a', {class:'btn', href:'#scan', text:'Скан', style:'text-decoration:none'}),
+        el('a', {class:'btn', href:'#recipes', text:'Рецепты', style:'text-decoration:none'})
+      ])
+    ])]));
+  }
+  MEALS.forEach(m => {
+    const items = entries.filter(e => e.meal === m);
+    if(!items.length) return;
+    const sub = items.reduce((a, e) => a + e.kcal, 0);
+    box.appendChild(el('div', {}, [
+      el('div', {class:'meal-h'}, [el('p', {class:'sec-h', text:m}), el('span', {class:'small', text:nf(sub) + ' ккал'})]),
+      el('div', {class:'group'}, items.map(e => el('div', {class:'cell entry'}, [
+        tile(m, true),
+        el('div', {class:'nm'}, [el('b', {text:e.name}), (e.p || e.f || e.c) ? el('span', {class:'small', text:'Б ' + e.p + ' · Ж ' + e.f + ' · У ' + e.c}) : null]),
+        el('div', {class:'kc', text:nf(e.kcal)}),
+        el('button', {class:'x', type:'button', 'aria-label':'Удалить запись «' + e.name + '»', onclick:() => {
+          const i = log.findIndex(x => x.id === e.id);
+          if(i >= 0){ log.splice(i, 1); saveLog(); updateMini(); renderDiary(); }
+        }}, [(() => { const s = document.createElementNS('http://www.w3.org/2000/svg','svg'); s.setAttribute('viewBox','0 0 14 14'); s.setAttribute('width','12'); s.setAttribute('height','12'); s.setAttribute('fill','none'); s.setAttribute('stroke','currentColor'); s.setAttribute('stroke-width','2'); s.setAttribute('stroke-linecap','round'); s.setAttribute('aria-hidden','true'); s.innerHTML = '<path d="M2 2l10 10M12 2L2 12"/>'; return s; })()])
+      ])))
+    ]));
+  });
+  updateMini();
+}
+function setGoal(v){
+  goal = Math.max(800, Math.min(5000, Math.round(v / 10) * 10));
+  store.set('tarelka.goal', goal);
+  renderDiary();
+  toast('Цель сохранена: ' + nf(goal) + ' ккал');
+}
+function calc(){
+  const out = $('calcOut'); out.textContent = '';
+  const sex = $('cSex').value, age = +$('cAge').value, w = +$('cW').value, h = +$('cH').value, act = +$('cAct').value, def = +$('cDef').value;
+  if(!(age >= 14 && age <= 90 && w >= 30 && w <= 300 && h >= 120 && h <= 230)){
+    out.appendChild(el('p', {class:'small', text:'Заполните возраст (14–90), вес (30–300 кг) и рост (120–230 см).'})); return;
+  }
+  const bmr = 10*w + 6.25*h - 5*age + (sex === 'm' ? 5 : -161);
+  const tdee = bmr * act;
+  const target = Math.round(tdee * (1 - def/100) / 10) * 10;
+  const floor = sex === 'm' ? 1500 : 1200;
+  const use = Math.max(target, floor);
+  out.appendChild(el('p', {class:'callout', text:'Для поддержания веса: около ' + nf(Math.round(tdee/10)*10) + ' ккал в день. С дефицитом ' + def + '%: ' + nf(target) + ' ккал.'}));
+  if(target < floor) out.appendChild(el('p', {class:'small', text:'Ниже ' + nf(floor) + ' ккал без врача рацион снижать не стоит, поэтому предлагаем ' + nf(floor) + '.'}));
+  out.appendChild(el('button', {class:'btn primary wide', type:'button', text:'Сделать целью: ' + nf(use) + ' ккал', onclick:() => setGoal(use)}));
+}
+
+/* ---------- подключение ---------- */
+function init(){
+  const kc = RECIPES.map(r => r.kcal);
+  const n = RECIPES.length;
+  $('recLead').textContent = n + ' ' + plural(n, 'рецепт', 'рецепта', 'рецептов') + ' из обычных продуктов: от ' + Math.min.apply(null, kc) + ' до ' + Math.max.apply(null, kc) + ' ккал на порцию.';
+
+  segScale = seg($('segScale'), [{v:0.5,t:'½'},{v:0.75,t:'¾'},{v:1,t:'1×'},{v:1.5,t:'1½'},{v:2,t:'2×'}], 1, v => { scale = v; renderResult(); }, 'Размер порции');
+  segMeal = fillSeg($('segMeal'), defaultMeal(), null, 'Приём пищи');
+  segManual = fillSeg($('segManual'), defaultMeal(), null, 'Приём пищи');
+  segFilter = seg($('segFilter'), ['Все'].concat(MEALS).map(m => ({v:m, t:m})), 'Все', v => { filterMeal = v; renderRecipes(); }, 'Фильтр по приёму пищи');
+  renderRecipes(); updateMini(); route();
+
+  const pick = inp => () => { if(locked) return; inp.value = ''; inp.click(); };
+  $('btnFinder').addEventListener('click', pick($('camInput')));
+  $('btnCam').addEventListener('click', pick($('camInput')));
+  $('btnPick').addEventListener('click', pick($('fileInput')));
+  $('camInput').addEventListener('change', e => onFile(e.target.files && e.target.files[0]));
+  $('fileInput').addEventListener('change', e => onFile(e.target.files && e.target.files[0]));
+  $('btnAnalyze').addEventListener('click', analyze);
+  $('btnCancel').addEventListener('click', () => { if(ctl) ctl.abort(); });
+  $('btnAdd').addEventListener('click', () => {
+    if(!base) return;
+    const S = v => Math.round(v * scale);
+    addEntry({meal:segMeal.get(), name:base.dish, kcal:S(base.kcal), p:S(base.p), f:S(base.f), c:S(base.c)});
+  });
+  $('q').addEventListener('input', e => { query = e.target.value; renderRecipes(); });
+  $('btnMenu').addEventListener('click', () => { menu = buildMenu(); $('btnMenu').textContent = 'Собрать заново'; renderMenu(); });
+  $('scrim').addEventListener('click', () => closeSheet());
+  $('sheetClose').addEventListener('click', () => closeSheet());
+  $('sheetAdd').addEventListener('click', () => {
+    const r = sheetRecipe; if(!r) return;
+    addEntry({meal:r.meal, name:r.name, kcal:r.kcal, p:r.p, f:r.f, c:r.c});
+    closeSheet();
+  });
+  $('manual').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('mName').value.trim(), kcal = Number($('mKcal').value);
+    if(!name || !(kcal > 0)) return;
+    addEntry({meal:segManual.get(), name:name, kcal:kcal, p:0, f:0, c:0});
+    $('mName').value = ''; $('mKcal').value = '';
+    renderDiary();
+  });
+  $('goalSave').addEventListener('click', () => { const v = Number($('goalInput').value); if(v >= 800) setGoal(v); });
+  $('calcBtn').addEventListener('click', calc);
+  refreshAnalyze();
+
+  (async () => {
+    try{ sample = (window.claude && window.claude.use) ? await window.claude.use('sample') : null; }catch(e){ sample = null; }
+    if(sample){
+      try{ const l = await sample.limits(); imgInfo = l.images || null; }catch(e){ imgInfo = null; }
+    }
+    if(!sample || !imgInfo){
+      lockScan('Распознавание по фото работает только внутри Claude. Рецепты, меню и дневник работают как обычно.');
+    }else{
+      const acc = imgInfo.mediaTypes.join(',');
+      $('camInput').setAttribute('accept', acc);
+      $('fileInput').setAttribute('accept', acc);
+    }
+  })();
+}
+init();
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>
